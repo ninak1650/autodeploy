@@ -40,11 +40,11 @@ encr_root = "gAAAAABoEfMBo7LMVNeSN5YWJ3L2P3B7EARh3_EUJd7f0cIWKxGBki0AJmMEzPWMcQx
 salt = b"UIy4SDkwW9a6gQkUrjXDBg=="
 passphrase = os.environ["DB_PASSPHRASE"].encode()
 kdf = PBKDF2HMAC(
-    algorithm=hashes.SHA256(),  # Correctly specify the hashing algorithm
+    algorithm=hashes.SHA256(),
     length=32,
     salt=urlsafe_b64decode(salt),
     iterations=100_000,
-    backend=default_backend()  # Use default_backend here
+    backend=default_backend() 
 )
 key = urlsafe_b64encode(kdf.derive(passphrase))
 fernet = Fernet(key)
@@ -54,10 +54,9 @@ def update_komponenten(event):
     master = cluster.get()
     master_conn(master)
     java_komponenten = java_komp(master)
-    # Update the second dropdown with new options
-    komponenten['values'] = java_komponenten
-    komponenten.set('')  # Clear current selection
+    komponenten.set('')
     input_box.delete(0, tk.END)
+    komponenten['values'] = java_komponenten
 
 
 def master_conn(master):
@@ -112,13 +111,6 @@ def deployKomp():
 
             jboss_conn = "/opt/wildfly/bin/jboss-cli.sh --controller=" + cluster.get() + ":9999 --user=admin --password=Admin --connect --commands='"
 
-            # list_all = "deploy -l"
-            # nill, stdout, stderr = client.exec_command( jboss_conn + list_all + "'" )
-            # output = stdout.read().decode('utf-8', errors='ignore').splitlines()
-            # print ("Deploy -l: ")
-            # print ("\n".join(output))
-
-
             if(komponente == "wwsreports"):
                 wget = "wget http://wwsrepo.mueller.de/repository/handelsmanagement/wwsreports/" + version.split("-")[0] + "/" + version.split("-")[1] + "/wwsreports-" + version + ".war"
             elif(komponente == "help"):
@@ -147,24 +139,31 @@ def deployKomp():
             while(retry_cnt <= 3):
                 print("Undeploying...")
                 nill, stdout, stderr = client.exec_command(undeploy)
-                print("Command executed")
                 output = stdout.read().decode("utf-8")
                 error = stderr.read().decode('utf-8')
                 exit_status = stdout.channel.recv_exit_status()
-                print("exit status " + str(exit_status))
                 if(exit_status):
                     if "timed out after" in output:
                         retry_cnt += 1
                         print("Undeploy timeout, trying again")
                     else:
-                        print("undeploy failed: " + output)
+                        print("Undeploy failed: " + output)
                         retry_cnt = 4
                 else:
                     retry_cnt = 5
             if retry_cnt == 4:
-                raise Exception("undeploy failed")
+                raise Exception("Undeploy failed")
             elif retry_cnt == 5:
-                print("undeploy done")
+                print("Undeploy done")
+
+            check_undeploy = "deploy -l"
+            nill, stdout, stderr = client.exec_command( jboss_conn + check_undeploy + "'" )
+            output = stdout.read().decode('utf-8', errors='ignore')
+            if((komponente + ".war") in output):
+                print("Undeploy failed")
+                raise Exception("Undeploy failed")
+            else:
+                print("Undeployed successfully")
 
             link_del = "rm /opt/wildfly/deploy/" + komponente + ".war"
             nill, stdout, stderr = client.exec_command(link_del)
@@ -172,12 +171,12 @@ def deployKomp():
             if(exit_status):
                 error = stderr.read().decode('utf-8')
                 if "No such file or directory" in error:
-                    print ("No link set, skipping link_del")
+                    print ("No link set, skipping old link deletion")
                 else:
-                    print("link_del failed: " + error)
-                    raise Exception("link_del failed")
+                    print("Old link deletion failed: " + error)
+                    raise Exception("Old link deletion failed")
             else:
-                print("link_del done")
+                print("Old link deletion done")
 
             if(komponente == "help"):
                 new_link = "ln -s /opt/wildfly/deploy/wwshelp-" + version + ".war /opt/wildfly/deploy/" + komponente + ".war"
@@ -186,10 +185,10 @@ def deployKomp():
             nill, stdout, stderr = client.exec_command(new_link)
             exit_status = stdout.channel.recv_exit_status()
             if(exit_status):
-                print("new_link failed: " + stderr.read().decode('utf-8'))
-                raise Exception("new_link failed")
+                print("Setting new link failed: " + stderr.read().decode('utf-8'))
+                raise Exception("Setting new link failed")
             else:
-                print("new_link done")
+                print("Setting new link done")
 
             #DB Update:
             if(komponente != "wwsreports" and komponente != "wwsartdecl" and komponente != "help" and komponente != "jmxservice"):
@@ -209,10 +208,10 @@ def deployKomp():
             nill, stdout, stderr = client.exec_command(deploy)
             exit_status = stdout.channel.recv_exit_status()
             if(exit_status):
-                print("deploy filed: " + stderr.read().decode('utf-8'))
-                raise Exception("deploy failed")
+                print("Deploy filed: " + stderr.read().decode('utf-8'))
+                raise Exception("Deploy failed")
             else:
-                print("deploy done")
+                print("Deploy done")
 
             ##ALTE VERSION LÖSCHEN
             if(komponente != "wwsartdecl" and isOldavailable):
@@ -223,12 +222,12 @@ def deployKomp():
                 nill, stdout, stderr = client.exec_command(rm_old)
                 exit_status = stdout.channel.recv_exit_status()
                 if(exit_status):    
-                    print("rm_old failed" + stderr.read().decode('utf-8'))
-                    raise Exception("rm_old failed")
+                    print("Removing old version failed" + stderr.read().decode('utf-8'))
+                    raise Exception("Removing old version failed")
                 else:
-                    print("rm_old done")
+                    print("Removing old version done")
             elif(not isOldavailable):
-                print("Skipping rm_old, no old Version found")
+                print("Skipping removing old version, no old Version found")
 
 
             komponenten.set('')
@@ -255,7 +254,7 @@ style.configure("TCombobox", font=global_font)
 style.configure("TLabel",    font=global_font)  
 style.configure("TCombobox", font=global_font)
 
-cluster = ttk.Combobox(root, values=["server690vmx"], width=30) #["server320vmx", "server662vmx", "server3061vmx", "server3261vmx", "server3261vmx"]
+cluster = ttk.Combobox(root, values=["server690vmx"], width=30) #["server320vmx", "server662vmx", "server3061vmx", "server3161vmx", "server3261vmx"]
 cluster.grid(row=0, column=0, padx=10, pady=5)
 
 
@@ -277,24 +276,3 @@ root.mainloop()
 
 client.close()
 conn.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-client.close()

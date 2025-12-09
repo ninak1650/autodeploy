@@ -15,11 +15,11 @@ global conn
 global cursor
 client = paramiko.SSHClient()
 server = "p_wwsdev2" #server = "p_wws"  
-username = "jukicsaso"  
-baen = "-395995"
+username = "chensaso"  
+baen = "-412133"
 database = "wwst3"  #database = "wwstp"  
 while(enter_pass):
-    sybase_pass = getpass.getpass(prompt="Enter your sybase password: ")
+    sybase_pass = getpass.getpass(prompt="Gib saso Passwort von p_wwsdev2 ein:")
     connection_string = f'DRIVER={{Adaptive Server Enterprise}};SERVER={server};PORT=20000;DATABASE={database};UID={username};PWD={sybase_pass}'   #11000
     try:
         conn = pyodbc.connect(connection_string)
@@ -80,8 +80,8 @@ def java_komp(master):
         
 
 def deployKomp():
-    version = input_box.get()
-    komponente = komponenten.get()
+    version = input_box.get() #Eingabe der neuen Version
+    komponente = komponenten.get() #Auswahl der Komponente aus der GUI
     isSoapserver = False
     if(komponente == ""):
         messagebox.showwarning("Warning", "Wähle eine Komponente aus!")
@@ -109,6 +109,7 @@ def deployKomp():
                 print("No old version found")
                 isOldavailable = False
 
+            #5 JBoss Client connection
             jboss_conn = "/opt/wildfly/bin/jboss-cli.sh --controller=" + cluster.get() + ":9999 --user=admin --password=Admin --connect --commands='"
 
             if(komponente == "wwsreports"):
@@ -134,6 +135,7 @@ def deployKomp():
                     if match:
                         print(match)
 
+            #6 undeploy
             retry_cnt = 0
             undeploy = jboss_conn + "undeploy " + komponente + ".war" + " --all-relevant-server-groups'"
             while(retry_cnt <= 3):
@@ -165,6 +167,7 @@ def deployKomp():
             else:
                 print("Undeployed successfully")
 
+            #7 Link löschen
             link_del = "rm /opt/wildfly/deploy/" + komponente + ".war"
             nill, stdout, stderr = client.exec_command(link_del)
             exit_status = stdout.channel.recv_exit_status()
@@ -178,6 +181,7 @@ def deployKomp():
             else:
                 print("Old link deletion done")
 
+            #8 den neuen Link setzen
             if(komponente == "help"):
                 new_link = "ln -s /opt/wildfly/deploy/wwshelp-" + version + ".war /opt/wildfly/deploy/" + komponente + ".war"
             else:
@@ -190,7 +194,7 @@ def deployKomp():
             else:
                 print("Setting new link done")
 
-            #DB Update:
+            #11 DB SYSPARAM Update:
             if(komponente != "wwsreports" and komponente != "wwsartdecl" and komponente != "help" and komponente != "jmxservice"):
                 set_min = "update SYSPARAM set WERT = '" + version + "', DAEN = getdate(), BAEN = " + baen + " where SYSITEM = 'VERSION." + (link.upper() if isSoapserver else komponente.upper()) + ".MIN'"
                 set_opt = "update SYSPARAM set WERT = '" + version + "', DAEN = getdate(), BAEN = " + baen + " where SYSITEM = 'VERSION." + (link.upper() if isSoapserver else komponente.upper()) + ".OPT'"
@@ -204,6 +208,7 @@ def deployKomp():
                 for row in rows:
                     print(row)
 
+            #10 neue Version deployen
             deploy = jboss_conn + "deploy /opt/wildfly/deploy/" + komponente + ".war  --name=" + komponente + ".war --runtime-name=" + komponente + ".war --all-server-groups'"
             nill, stdout, stderr = client.exec_command(deploy)
             exit_status = stdout.channel.recv_exit_status()
@@ -241,11 +246,51 @@ def deployKomp():
     else:
         messagebox.showwarning("Warning", "Gib eine Version ein!")
 
+
+
+def open_new_component_popup(parent, style_font=("Arial", 13)):
+    popup = tk.Toplevel(parent)
+    popup.title("Neue Komponente")
+    popup.geometry("420x200")
+    popup.resizable(False, False)
+
+    # optional: Styles im Popup anwenden
+    style = ttk.Style(popup)
+    style.configure("TLabel", font=style_font)
+    style.configure("TEntry", font=style_font)
+    style.configure("TButton", font=style_font)
+
+    # Zentrieren
+    popup.update_idletasks()
+    w, h = 400, 200
+    x = parent.winfo_rootx() + (parent.winfo_width() // 2) - (w // 2)
+    y = parent.winfo_rooty() + (parent.winfo_height() // 2) - (h // 2)
+    popup.geometry(f"{w}x{h}+{x}+{y}")
+
+    # Eingabefelder
+    font = ("Arial", 13)
+    ttk.Label(popup, text="Cluster:", font=font).grid(row=0, column=0, padx=10, pady=10, sticky="w")
+    cluster_entry = ttk.Combobox(popup, values=["server690vmx"], width=25)
+    cluster_entry.grid(row=0, column=1, padx=(6,12), pady=(10,5), sticky="we")
+
+    ttk.Label(popup, text="Komponente:", font=font).grid(row=1, column=0, padx=10, pady=10, sticky="w")
+    komponent_entry = ttk.Entry(popup, font=font, width=25)
+    komponent_entry.grid(row=1, column=1, padx=(6,12), pady=5, sticky="we")
+
+    ttk.Label(popup, text="Version:", font=font).grid(row=2, column=0, padx=10, pady=10, sticky="w")
+    version_entry = ttk.Entry(popup, font=font, width=25)
+    version_entry.grid(row=2, column=1, padx=(6,12), pady=(5,12), sticky="we")
+
+    deploy_btn = ttk.Button(popup, text="Deploy", command=deployKomp)
+    deploy_btn.grid(row=3, column=0, padx=6)
+
+
+
 # Create the main window
 
 root = tk.Tk()
 root.title("Wildfly ausliefern")
-root.geometry("300x200")
+root.geometry("420x200")
 root.resizable(False, False)
 
 global_font = ("Arial", 13) 
@@ -254,19 +299,45 @@ style.configure("TCombobox", font=global_font)
 style.configure("TLabel",    font=global_font)  
 style.configure("TCombobox", font=global_font)
 
+root.columnconfigure(0, weight=0)  # Labelspalte
+root.columnconfigure(1, weight=1)  # Eingabespalte
+
+lbl_cluster = ttk.Label(root, text="Cluster:")
+lbl_cluster.grid(row=0, column=0, padx=(12,6), pady=(10,5), sticky="e")
 cluster = ttk.Combobox(root, values=["server690vmx"], width=30) #["server320vmx", "server662vmx", "server3061vmx", "server3161vmx", "server3261vmx"]
-cluster.grid(row=0, column=0, padx=10, pady=5)
+cluster.grid(row=0, column=1, padx=(6,12), pady=(10,5), sticky="we")
 
 
+lbl_komp = ttk.Label(root, text="Komponente:")
+lbl_komp.grid(row=1, column=0, padx=(12,6), pady=5, sticky="e")
 komponenten = ttk.Combobox(root, values=[], width=30)
-komponenten.grid(row=1, column=0, padx=10, pady=5)
+komponenten.grid(row=1, column=1, padx=(6,12), pady=5, sticky="we")
 
 
+lbl_version = ttk.Label(root, text="Version:")
+lbl_version.grid(row=2, column=0, padx=(12,6), pady=(5,12), sticky="e")
 input_box = tk.Entry(root, font=global_font, width=30)
-input_box.grid(row=2, column=0, padx=10, pady=20)
+input_box.grid(row=2, column=1, padx=(6,12), pady=(5,12), sticky="we")
 
-deploy_btn = ttk.Button(root, text="Deploy", command=deployKomp)
-deploy_btn.grid(row=3, column=0, padx=20,pady=10)
+
+
+btn_row = ttk.Frame(root)
+btn_row.grid(row=3, column=0, columnspan=2, padx=12, pady=8, sticky="we")
+
+btn_row.columnconfigure(0, weight=1)
+btn_row.columnconfigure(1, weight=0)
+btn_row.columnconfigure(2, weight=1)
+
+buttons_center = ttk.Frame(btn_row)
+buttons_center.grid(row=0, column=1) 
+
+update_btn = ttk.Button(buttons_center, text="Aktualisieren", command=deployKomp)
+update_btn.grid(row=0, column=0, padx=8)
+
+new_btn = ttk.Button(buttons_center, text="Neue Komponente",
+                     command=lambda: open_new_component_popup(root, global_font))
+new_btn.grid(row=0, column=1, padx=8)
+
 
 
 cluster.bind("<<ComboboxSelected>>", update_komponenten)

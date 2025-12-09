@@ -15,8 +15,8 @@ global conn
 global cursor
 client = paramiko.SSHClient()
 server = "p_wwsdev2" #server = "p_wws"  
-username = "jukicsaso"  
-baen = "-395995"
+username = ""  
+baen = "-"
 database = "wwst3"  #database = "wwstp"  
 while(enter_pass):
     sybase_pass = getpass.getpass(prompt="Enter your sybase password: ")

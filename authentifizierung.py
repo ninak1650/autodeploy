@@ -38,7 +38,7 @@ def decrypt_root_password():
 def connect_to_database():
     """Fragt das Sybase-Passwort ab und stellt eine Datenbankverbindung her."""
     server = "p_wwsdev2" #server = "p_wws"
-    username = "chensaso"
+    username = "" #saso-Name
     database = "wwst3" #database = "wwstp"
 
     while True:

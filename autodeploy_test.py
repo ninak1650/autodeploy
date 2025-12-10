@@ -12,7 +12,7 @@ if not client or not conn or not decr_root:
 
 # Globale Variablen
 cursor = conn.cursor()
-baen = "-412133"
+baen = "-" #MA-Nummer
 
 # === GUI-HELFERFUNKTIONEN ===
 def master_conn(master):

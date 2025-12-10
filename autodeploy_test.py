@@ -1,84 +1,60 @@
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.backends import default_backend
-from cryptography.fernet import Fernet
-from base64 import urlsafe_b64encode, urlsafe_b64decode
-import os
-import paramiko
-import getpass
-import re
-import tkinter as tk; from tkinter import ttk, messagebox
+import tkinter as tk
+from tkinter import ttk, messagebox
 import pyodbc
+import paramiko
+import sys 
+from authentifizierung import perform_authentication
 
-enter_pass = True
-global conn
-global cursor
-client = paramiko.SSHClient()
-server = "p_wwsdev2" #server = "p_wws"  
-username = "chensaso"  
+# === 1. AUTHENTIFIZIERUNG BEIM START ===
+# Importiere die Funktion aus der anderen Datei und rufe sie sofort auf.
+from authentifizierung import perform_authentication
+client, conn, decr_root = perform_authentication()
+
+# Beende das Programm sauber, wenn die Authentifizierung fehlschlägt.
+if not client or not conn or not decr_root:
+    print("\nProgramm wird aufgrund eines Authentifizierungsfehlers beendet.")
+    sys.exit(1)
+
+# === 2. GLOBALE VARIABLEN SETZEN ===
+# Diese Variablen sind jetzt für das ganze GUI-Skript verfügbar.
+cursor = conn.cursor()
 baen = "-412133"
-database = "wwst3"  #database = "wwstp"  
-# DATABASE CONNECTION
-while(enter_pass):
-    sybase_pass = getpass.getpass(prompt="Gib saso Passwort von p_wwsdev2 ein:")
-    connection_string = f'DRIVER={{Adaptive Server Enterprise}};SERVER={server};PORT=20000;DATABASE={database};UID={username};PWD={sybase_pass}'   #11000
-    try:
-        conn = pyodbc.connect(connection_string)
-        cursor = conn.cursor()
-        if(cursor):
-            enter_pass = False
-    except pyodbc.Error as e:
-        if "Login failed" in str(e):
-            print("Login failed, please try again.")
-            enter_pass = True
-        else:
-            print("An error occured, aborting: {e}")
-            enter_pass = False
-            os._exit(1)
 
-# DECRYPTION LOGIC
-encr_root = "gAAAAABoEfMBo7LMVNeSN5YWJ3L2P3B7EARh3_EUJd7f0cIWKxGBki0AJmMEzPWMcQxTBRjiXd2rIXEQmnGDQtdg1MKOOTGZobdyZnsUG8hoVjEy0GpWQYQ="
-salt = b"UIy4SDkwW9a6gQkUrjXDBg=="
-passphrase = os.environ["DB_PASSPHRASE"].encode()
-kdf = PBKDF2HMAC(
-    algorithm=hashes.SHA256(),
-    length=32,
-    salt=urlsafe_b64decode(salt),
-    iterations=100_000,
-    backend=default_backend() 
-)
-key = urlsafe_b64encode(kdf.derive(passphrase))
-fernet = Fernet(key)
-decr_root = fernet.decrypt(encr_root.encode())
-
-def update_komponenten(event):
-    master = cluster.get()
-    master_conn(master)
-    java_komponenten = java_komp(master)
-    komponenten.set('')
-    input_box.delete(0, tk.END)
-    komponenten['values'] = java_komponenten
-
+# === 3. LOGIK-FUNKTIONEN ===
 
 def master_conn(master):
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    """Baut die SSH-Verbindung zum ausgewählten Master-Server auf."""
     try:
-        client.connect(master, username='root', password=decr_root.decode(), look_for_keys=False, allow_agent=False)          
+        client.connect(master, username='root', password=decr_root, look_for_keys=False, allow_agent=False)
+        print(f"SSH-Verbindung zu {master} erfolgreich hergestellt.")
+        return True
     except Exception as e:
-        print(f"An error occurred: {e}")
-    
-
+        print(f"Fehler bei der SSH-Verbindung zu {master}: {e}")
+        messagebox.showerror("Verbindungsfehler", f"Konnte keine SSH-Verbindung zu {master} herstellen:\n\n{e}")
+        return False
 
 def java_komp(master):
-    nill, stdout, stderr = client.exec_command("/opt/wildfly/bin/jboss-cli.sh --controller=" + master + ":9999 --user=admin --password=Admin --connect --commands='deploy -l'" )
-    output = stdout.read().decode('utf-8', errors='ignore').splitlines()
-    java_komp = []
-    for line in output[1:-1]:
-        if "jmx.war" not in line:
-            java_komp.append(line.partition(".war")[0])
-    return java_komp
+    """Holt die Liste der deployten Java-Komponenten vom Master."""
+    try:
+        nill, stdout, stderr = client.exec_command(f"/opt/wildfly/bin/jboss-cli.sh --controller={master}:9999 --user=admin --password=Admin --connect --commands='deploy -l'")
+        output = stdout.read().decode('utf-8', errors='ignore').splitlines()
+        java_komp_list = []
+        for line in output[1:-1]:
+            if "jmx.war" not in line:
+                java_komp_list.append(line.partition(".war")[0])
+        return java_komp_list
+    except Exception as e:
+        messagebox.showerror("Fehler", f"Konnte Komponenten nicht abrufen: {e}")
+        return []
 
-        
+def update_komponenten(event):
+    """Aktualisiert die Komponenten-Liste, wenn ein Cluster ausgewählt wird."""
+    master = cluster.get()
+    if master_conn(master):
+        java_komponenten = java_komp(master)
+        komponenten.set('')
+        input_box.delete(0, tk.END)
+        komponenten['values'] = java_komponenten    
 
 def deployKomp(komponente, version, cluster_val, is_new_component=False):
     """
@@ -245,11 +221,8 @@ def deployKomp(komponente, version, cluster_val, is_new_component=False):
         print(f"FEHLER im Deploy-Prozess: {e}")
         messagebox.showerror("Prozess fehlgeschlagen", f"Ein Fehler ist aufgetreten:\n\n{e}")
 
-
-
-
-# ===== NEU: Das modale Popup-Fenster =====
 def open_new_component_popup(parent, style_font):
+    """Öffnet das modale Popup-Fenster für neue Komponenten."""
     popup = tk.Toplevel(parent)
     popup.title("Neue Komponente deployen")
     popup.resizable(False, False)
@@ -291,7 +264,7 @@ def open_new_component_popup(parent, style_font):
     popup.grab_set()       # Blockiert andere Fenster
     parent.wait_window(popup) # Wartet, bis dieses Fenster geschlossen wird
 
-# --- Hauptfenster (root) ---
+# === 4. GUI AUFBAU ===
 root = tk.Tk()
 root.title("Wildfly ausliefern")
 root.geometry("420x200")

@@ -159,7 +159,7 @@ def run_deployment_workflow(client, conn, cursor, baen, komponente, version, clu
         messagebox.showinfo("Erfolg", f"Deploy von '{komponente}' erfolgreich abgeschlossen!")
 
     except Exception as e:
-        # Wenn irgendein Schritt fehlschlägt, fangen wir den Fehler hier ab.
+        # Wenn irgendein Schritt fehlschlägt, den Fehler wurde hier abgefangen.
         print(f"FEHLER im Workflow: {e}")
         messagebox.showerror("Prozess fehlgeschlagen", f"Ein Fehler ist aufgetreten:\n\n{e}")
 

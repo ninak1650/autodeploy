@@ -1,8 +1,9 @@
 Anleitung: Auto-Deploy Skript
 1. Code anpassen (für Test & Prod)
 
-In authentifizierung.py: Zeile 40 (username)
-In autodeploy_test(&prod).py: Zeile 15 (bean)
+In authentifizierung.py: Zeile 38 (saso-username)
+In autodeploy_test.py: Zeile 8 (PSNR)
+In autodeploy_prod.py: Zeile 8 (PSNR)
 
 2. Umgebung einrichten 
 Pakete installieren: pip install pyodbc paramiko cryptography

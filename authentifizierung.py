@@ -1,5 +1,3 @@
-# authentifizierung.py
-
 import os
 import getpass
 import paramiko
@@ -35,19 +33,15 @@ def decrypt_root_password():
         print(f"FEHLER bei der Entschlüsselung des Root-Passworts: {e}")
         return None
 
-def connect_to_database():
-    """Fragt das Sybase-Passwort ab und stellt eine Datenbankverbindung her."""
-    server = "p_wwsdev2" #server = "p_wws"
-    username = "" #saso-Name
-    database = "wwst3" #database = "wwstp"
-
+def connect_to_database(server, database):
+    """Fragt das Sybase-Passwort ab und stellt eine DB-Verbindung zum übergebenen Server her."""
+    username = ""  #saso-Name, anpassen!
     while True:
         sybase_pass = getpass.getpass(prompt=f"Gib das Sybase-Passwort für '{username}' auf '{server}' ein: ")
         connection_string = f'DRIVER={{Adaptive Server Enterprise}};SERVER={server};PORT=20000;DATABASE={database};UID={username};PWD={sybase_pass}'
-        
         try:
             conn = pyodbc.connect(connection_string, timeout=5)
-            print("  -> Datenbankverbindung erfolgreich hergestellt.")
+            print(f"  -> Datenbankverbindung zu {database}@{server} erfolgreich hergestellt.")
             return conn
         except pyodbc.Error as e:
             if "Login failed" in str(e):
@@ -63,14 +57,12 @@ def create_ssh_client():
     print("  -> SSH-Client initialisiert.")
     return client
 
-def perform_authentication():
-    """
-    Hauptfunktion dieses Moduls. Führt alle Authentifizierungsschritte aus
-    und gibt die fertigen Verbindungsobjekte oder None bei Fehlern zurück.
-    """
-    print("Starte Authentifizierungsprozess...")
+def perform_authentication(server, database):
+    """Führt alle Authentifizierungsschritte für die angegebene Umgebung aus."""
+    print(f"Starte Authentifizierungsprozess für: {database}@{server}")
     
-    db_connection = connect_to_database()
+    # Ruft connect_to_database mit den Parametern auf
+    db_connection = connect_to_database(server, database)
     if not db_connection:
         print("Abbruch: Datenbankverbindung konnte nicht hergestellt werden.")
         return None, None, None

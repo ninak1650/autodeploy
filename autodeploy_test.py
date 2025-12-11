@@ -5,7 +5,7 @@ import GUI
 # === TEST-KONFIGURATION ===
 TEST_SERVER = "p_wwsdev2"
 TEST_DATABASE = "wwst3"
-TEST_BAEN = "-" #PSNR, anpassen!
+TEST_BAEN = "-412133" #PSNR, anpassen!
 
 print("===============================")
 print("=== STARTE IM TEST-UMGEBUNG ===")

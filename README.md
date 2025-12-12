@@ -1,18 +1,22 @@
 Autodeploy von Wildfly Komponenten
-Für ein detailliertes Verständnis der Projektarchitektur und wie die einzelnen Skripte zusammenarbeiten, siehe die Datei INFO.md.
+Für ein detailliertes Verständnis der Projektarchitektur und wie die einzelnen Skripte zusammenarbeiten, siehe die Datei **INFO.md**.
 
 🔧 Vorbereitung
 
 1. Code anpassen (für Test & Prod)
 
 -In authentifizierung.py: Zeile 38 (saso-username)
+
 -In autodeploy_test.py: Zeile 8 (PSNR)
+
 -In autodeploy_prod.py: Zeile 8 (PSNR)
 
 2. Umgebungsvariable setzen
 Die Umgebungsvariable DB_PASSPHRASE muss definiert werden.
 ➡️ Martina fragen für den korrekten Wert.
+
 -Powershell: $env:DB_PASSPHRASE = " "
+
 -cmd: setx DB_PASSPHRASE " "
 
 3. Command Prompt öffnen

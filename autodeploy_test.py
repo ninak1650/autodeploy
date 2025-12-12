@@ -11,13 +11,13 @@ print("===============================")
 print("=== STARTE IM TEST-UMGEBUNG ===")
 print("===============================")
 
-# 1. Authentifizierung
+# Authentifizierung
 client, conn, decr_root = authentifizierung.perform_authentication(
     server=TEST_SERVER, 
     database=TEST_DATABASE
 )
 
-# 2. GUI starten
+# GUI starten
 if client and conn and decr_root:
     GUI.start_application(client, conn, decr_root, TEST_BAEN)
 else:

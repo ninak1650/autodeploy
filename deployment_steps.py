@@ -24,14 +24,23 @@ def download_war_file(client, komponente, version, link, isSoapserver):
     print("  -> Lade neue .war-Datei herunter...")
     nav = "cd /opt/wildfly/deploy && "
 
+    filename = ""
+    url = ""
+
     if komponente == "wwsreports":
-        wget_cmd = f"wget http://wwsrepo.mueller.de/repository/handelsmanagement/wwsreports/{version.split('-')[0]}/{version.split('-')[1]}/wwsreports-{version}.war"
+        filename = f"wwsreports-{version}.war"
+        url = f"http://wwsrepo.mueller.de/repository/handelsmanagement/wwsreports/{version.split('-')[0]}/{version.split('-')[1]}/{filename}"
     elif komponente == "help":
-        wget_cmd = f"wget http://wwsrepo.mueller.de/repository/handelsmanagement/wwshelp/{version.split('-')[0]}/{version.split('-')[1]}/wwshelp-{version}.war"
+        filename = f"wwshelp-{version}.war"
+        url = f"http://wwsrepo.mueller.de/repository/handelsmanagement/wwshelp/{version.split('-')[0]}/{version.split('-')[1]}/{filename}"
     elif isSoapserver:
-        wget_cmd = f"wget http://wwsrepo.mueller.de/repository/maven-releases/de/mueller/erp/apps/{link}/{version}/{link}-{version}.war"
+        filename = f"{link}-{version}.war"
+        url = f"http://wwsrepo.mueller.de/repository/maven-releases/de/mueller/erp/apps/{link}/{version}/{filename}"
     else:
-        wget_cmd = f"wget http://wwsrepo.mueller.de/repository/maven-releases/de/mueller/erp/apps/{komponente}/{version}/{komponente}-{version}.war"
+        filename = f"{komponente}-{version}.war"
+        url = f"http://wwsrepo.mueller.de/repository/maven-releases/de/mueller/erp/apps/{komponente}/{version}/{filename}"
+
+    wget_cmd = f"wget -O {filename} {url}"
 
     if komponente != "wwsartdecl":
         _, stdout, stderr = client.exec_command(nav + wget_cmd)
@@ -138,7 +147,6 @@ def update_sysparams(conn, cursor, komponente, version, link, isSoapserver, baen
 
     else:
         print("  -> Komponente benötigt kein DB-Update, wird übersprungen.")
-
 
 """Löscht die alte .war-Datei vom Server."""
 def remove_old_war_file(client, komponente, old_version, link, isSoapserver):

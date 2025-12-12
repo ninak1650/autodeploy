@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from workflow import run_deployment_workflow
+from workflow import deploy_existing_component, deploy_new_component
 
 def start_application(client, conn, decr_root, baen):
     """Erstellt und startet die gesamte GUI-Anwendung."""
@@ -55,7 +55,12 @@ def start_application(client, conn, decr_root, baen):
         version_entry.grid(row=2, column=1, padx=12, pady=5, sticky="we")
 
         def on_deploy_new():
-            run_deployment_workflow(client, conn, cursor, baen, komponent_entry.get(), version_entry.get(), cluster_entry.get(), is_new_component=True)
+            deploy_new_component(
+                client, decr_root, conn, cursor, baen, 
+                komponent_entry.get(), 
+                version_entry.get(), 
+                cluster_entry.get()
+            )
             popup.destroy()
 
         deploy_btn = ttk.Button(popup, text="Deploy", command=on_deploy_new)
@@ -94,7 +99,13 @@ def start_application(client, conn, decr_root, baen):
     btn_row = ttk.Frame(root)
     btn_row.grid(row=3, column=0, columnspan=2, pady=8)
 
-    update_btn = ttk.Button(btn_row, text="Aktualisieren", command=lambda: run_deployment_workflow(client, conn, cursor, baen, komponenten.get(), input_box.get(), cluster.get()))
+    update_btn = ttk.Button(btn_row, text="Aktualisieren", 
+                            command=lambda: deploy_existing_component(
+                                client, decr_root, conn, cursor, baen, 
+                                komponenten.get(), 
+                                input_box.get(), 
+                                cluster.get()
+                            ))
     update_btn.pack(side=tk.LEFT, padx=8)
 
     new_btn = ttk.Button(btn_row, text="Neue Komponente", command=lambda: open_new_component_popup(root, global_font))

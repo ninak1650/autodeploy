@@ -1,4 +1,5 @@
 Autodeploy von Wildfly Komponenten
+Für ein detailliertes Verständnis der Projektarchitektur und wie die einzelnen Skripte zusammenarbeiten, siehe die Datei INFO.md.
 
 🔧 Vorbereitung
 
@@ -23,7 +24,6 @@ Führe folgende Befehle aus:
 pip3 install cryptography
 pip3 install paramiko
 pip3 install pyodbc
-
 
 
 5. Skripte ausführen

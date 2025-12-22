@@ -6,6 +6,7 @@ import GUI
 TEST_SERVER = "p_wwsdev2"
 TEST_DATABASE = "wwst3"
 TEST_BAEN = "-" #PSNR, anpassen!
+TEST_PORT = 20000
 
 print("===============================")
 print("=== STARTE IM TEST-UMGEBUNG ===")
@@ -14,7 +15,8 @@ print("===============================")
 # Authentifizierung
 client, conn, decr_root = authentifizierung.perform_authentication(
     server=TEST_SERVER, 
-    database=TEST_DATABASE
+    database=TEST_DATABASE,
+    port=TEST_PORT
 )
 
 # GUI starten

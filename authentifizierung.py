@@ -33,15 +33,16 @@ def decrypt_root_password():
         print(f"FEHLER bei der Entschlüsselung des Root-Passworts: {e}")
         return None
 
-def connect_to_database(server, database):
-    """Fragt das Sybase-Passwort ab und stellt eine DB-Verbindung zum übergebenen Server her."""
-    username = ""  #saso-Name, anpassen!
+def connect_to_database(server, database, port):
+    """Fragt das Sybase-Passwort ab und stellt eine DB-Verbindung zum übergebenen Server und Port her."""
+    username = "" #saso-Name, anpassen!
     while True:
-        sybase_pass = getpass.getpass(prompt=f"Gib das Saso-Passwort für '{username}' auf '{server}' ein: ")
-        connection_string = f'DRIVER={{Adaptive Server Enterprise}};SERVER={server};PORT=20000;DATABASE={database};UID={username};PWD={sybase_pass}'
+        sybase_pass = getpass.getpass(prompt=f"Gib das Sybase-Passwort für '{username}' auf '{server}' ein: ")
+        connection_string = f'DRIVER={{Adaptive Server Enterprise}};SERVER={server};PORT={port};DATABASE={database};UID={username};PWD={sybase_pass}'
+        
         try:
             conn = pyodbc.connect(connection_string, timeout=5)
-            print(f"  -> Datenbankverbindung zu {database}@{server} erfolgreich hergestellt.")
+            print(f"  -> Datenbankverbindung zu {database}@{server}:{port} erfolgreich hergestellt.")
             return conn
         except pyodbc.Error as e:
             if "Login failed" in str(e):
@@ -49,7 +50,7 @@ def connect_to_database(server, database):
             else:
                 print(f"Ein unerwarteter DB-Fehler ist aufgetreten: {e}")
                 return None
-
+            
 def create_ssh_client():
     """Erstellt und konfiguriert ein SSH-Client-Objekt."""
     client = paramiko.SSHClient()
@@ -57,12 +58,11 @@ def create_ssh_client():
     print("  -> SSH-Client initialisiert.")
     return client
 
-def perform_authentication(server, database):
+def perform_authentication(server, database, port):
     """Führt alle Authentifizierungsschritte für die angegebene Umgebung aus."""
     print(f"Starte Authentifizierungsprozess für: {database}@{server}")
     
-    # Ruft connect_to_database mit den Parametern auf
-    db_connection = connect_to_database(server, database)
+    db_connection = connect_to_database(server, database, port)
     if not db_connection:
         print("Abbruch: Datenbankverbindung konnte nicht hergestellt werden.")
         return None, None, None

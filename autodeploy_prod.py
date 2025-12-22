@@ -6,6 +6,7 @@ import GUI
 PROD_SERVER = "p_wws"      
 PROD_DATABASE = "wwstp"  
 PROD_BAEN = "-"      #PSNR, anpassen!
+PROD_PORT = 11000
 
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 print("!!! STARTE IM PROD-UMGEBUNG !!!")
@@ -14,7 +15,8 @@ print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 # Authentifizierung
 client, conn, decr_root = authentifizierung.perform_authentication(
     server=PROD_SERVER, 
-    database=PROD_DATABASE
+    database=PROD_DATABASE,
+    port=PROD_PORT
 )
 
 # GUI starten

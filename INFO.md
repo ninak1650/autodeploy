@@ -4,7 +4,7 @@ Die Architektur:
 
 Die Start-Skripte der Anwendung. Das sind die einzigen Dateien, die du jemals direkt ausführst.
 Definieren die umgebungsspezifische Konfiguration (Server, Datenbank, BAEN) für TEST bzw. PROD. Sie initiieren den Authentifizierungsprozess und starten die GUI.
-
+Unterschied: Test Port=20000/ Prod Port=11000
 2. authentifizierung.py 
 Passwörter prüfen und Zugang verschaffen.
 

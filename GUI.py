@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from workflow import deploy_existing_component, deploy_new_component
 
-def start_application(client, conn, decr_root, baen):
+def start_application(client, conn, decr_root, baen, clusters):
     """Erstellt und startet die gesamte GUI-Anwendung."""
     
     cursor = conn.cursor()
@@ -43,8 +43,10 @@ def start_application(client, conn, decr_root, baen):
         popup.geometry(f"420x200+{x}+{y}")
         
         ttk.Label(popup, text="Cluster:", font=style_font).grid(row=0, column=0, padx=10, pady=10, sticky="w")
-        cluster_entry = ttk.Combobox(popup, values=["server690vmx"], width=25, font=style_font)
+        cluster_entry = ttk.Combobox(popup, values=clusters, width=25, font=style_font)
         cluster_entry.grid(row=0, column=1, padx=12, pady=10, sticky="we")
+        if clusters:
+            cluster_entry.set(clusters[0])
 
         ttk.Label(popup, text="Komponente:", font=style_font).grid(row=1, column=0, padx=10, pady=10, sticky="w")
         komponent_entry = ttk.Entry(popup, font=style_font, width=25)
@@ -83,8 +85,10 @@ def start_application(client, conn, decr_root, baen):
 
     lbl_cluster = ttk.Label(root, text="Cluster:")
     lbl_cluster.grid(row=0, column=0, padx=(12, 6), pady=(10, 5), sticky="e")
-    cluster = ttk.Combobox(root, values=["server690vmx"], width=30)
+    cluster = ttk.Combobox(root, values=clusters, width=30)
     cluster.grid(row=0, column=1, padx=(6, 12), pady=(10, 5), sticky="we")
+    if clusters:
+        cluster.set(clusters[0])
 
     lbl_komp = ttk.Label(root, text="Komponente:")
     lbl_komp.grid(row=1, column=0, padx=(12, 6), pady=5, sticky="e")
@@ -112,7 +116,9 @@ def start_application(client, conn, decr_root, baen):
     new_btn.pack(side=tk.LEFT, padx=8)
     
     cluster.bind("<<ComboboxSelected>>", update_komponenten)
-
+    if clusters:
+        update_komponenten(None)
+    
     # --- GUI starten ---
     root.mainloop()
 

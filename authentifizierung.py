@@ -35,7 +35,7 @@ def decrypt_root_password():
 
 def connect_to_database(server, database, port):
     """Fragt das Sybase-Passwort ab und stellt eine DB-Verbindung zum übergebenen Server und Port her."""
-    username = "" #saso-Name, anpassen!
+    username = ""
     while True:
         sybase_pass = getpass.getpass(prompt=f"Gib das Sybase-Passwort für '{username}' auf '{server}' ein: ")
         connection_string = f'DRIVER={{Adaptive Server Enterprise}};SERVER={server};PORT={port};DATABASE={database};UID={username};PWD={sybase_pass}'

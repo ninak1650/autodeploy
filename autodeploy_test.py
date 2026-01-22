@@ -9,8 +9,13 @@ TEST_BAEN = "-"
 TEST_PORT = 20000
 TEST_CLUSTERS = ["server690vmx"]
 
+# Farben definieren
+YELLOW = '\033[93m'
+RED = '\033[91m'
+RESET = '\033[0m'
+
 print("===============================")
-print("=== STARTE IM TEST-UMGEBUNG ===")
+print(f"=== STARTE IM {YELLOW}TEST-UMGEBUNG{RESET} ===")
 print("===============================")
 
 # Authentifizierung
@@ -24,5 +29,5 @@ client, conn, decr_root = authentifizierung.perform_authentication(
 if client and conn and decr_root:
     GUI.start_application(client, conn, decr_root, TEST_BAEN, TEST_CLUSTERS)
 else:
-    print("\nProgramm wird aufgrund eines Authentifizierungsfehlers beendet.")
+    print(f"\n{RED}Programm wird aufgrund eines Authentifizierungsfehlers beendet.")
     sys.exit(1)

@@ -1,3 +1,9 @@
+# Farben definieren
+YELLOW = '\033[93m'
+GREEN = '\033[92m'  
+RED = '\033[91m'
+RESET = '\033[0m'
+
 """Sucht nach einer alten Version der Komponente und gibt die Version zurück."""
 def find_old_version(client, komponente, link, isSoapserver):
     print("  -> Suche nach alter Version...")
@@ -12,7 +18,7 @@ def find_old_version(client, komponente, link, isSoapserver):
             old_version = output[0].replace("wwshelp-", "")[:-4]
         else:
             old_version = output[0].replace((link if isSoapserver else komponente) + "-", "")[:-4]
-        print(f"     Alte Version gefunden: {old_version}")
+        print(f"     Alte Version gefunden: {YELLOW}{old_version}{RESET}")
         return old_version
     
     print("     Keine alte Version gefunden.")
@@ -45,8 +51,8 @@ def download_war_file(client, komponente, version, link, isSoapserver):
     if komponente != "wwsartdecl":
         _, stdout, stderr = client.exec_command(nav + wget_cmd)
         if stdout.channel.recv_exit_status() != 0:
-            raise Exception(f"wget fehlgeschlagen: {stderr.read().decode('utf-8')}")
-    print("     Download erfolgreich.")
+            raise Exception(f"wget {RED}fehlgeschlagen{RESET}: {stderr.read().decode('utf-8')}")
+    print(f"     Download {GREEN}erfolgreich{RESET}.")
 
 
 """Führt 'undeploy' auf dem JBoss-Server aus."""
@@ -57,15 +63,15 @@ def undeploy_old_version(client, komponente, jboss_conn):
     for i in range(3):
         _, stdout, stderr = client.exec_command(undeploy_cmd)
         if stdout.channel.recv_exit_status() == 0:
-            print("     Undeploy erfolgreich.")
+            print(f"     Undeploy {GREEN}erfolgreich{RESET}.")
             return
         else:
             output = stderr.read().decode('utf-8')
             if "timed out" in output:
-                print(f"     Undeploy Timeout, versuche erneut ({i+1}/3)...")
+                print(f"     Undeploy Timeout, {YELLOW}versuche erneut ({i+1}/3)...")
             else:
-                raise Exception(f"Undeploy fehlgeschlagen: {output}")
-    raise Exception("Undeploy ist nach 3 Versuchen fehlgeschlagen.")
+                raise Exception(f"Undeploy {RED}fehlgeschlagen: {output}")
+    raise Exception(f"Undeploy ist nach 3 Versuchen {RED}fehlgeschlagen{RESET}.")
 
 
 """Löscht den alten Symlink im Deploy-Verzeichnis."""
@@ -75,7 +81,7 @@ def remove_old_symlink(client, komponente):
     _, _, stderr = client.exec_command(rm_link_cmd)
     error = stderr.read().decode('utf-8')
     if error and "No such file or directory" not in error:
-         raise Exception(f"Löschen des Links fehlgeschlagen: {error}")
+         raise Exception(f"Löschen des Links {RED}fehlgeschlagen{RESET}: {error}")
     print("     Alter Link gelöscht oder war nicht vorhanden.")
 
 
@@ -89,8 +95,8 @@ def create_new_symlink(client, komponente, version, link, isSoapserver):
     
     _, _, stderr = client.exec_command(new_link_cmd)
     if stderr.read():
-        raise Exception(f"Setzen des neuen Links fehlgeschlagen: {stderr.read().decode('utf-8')}")
-    print("     Neuer Link erfolgreich gesetzt.")
+        raise Exception(f"Setzen des neuen Links {RED}fehlgeschlagen{RESET}: {stderr.read().decode('utf-8')}")
+    print(f"     Neuer Link {GREEN}erfolgreich{RESET} gesetzt.")
 
 
 """Führt 'deploy' der neuen Version auf dem JBoss-Server aus."""
@@ -99,8 +105,8 @@ def deploy_new_version(client, komponente, jboss_conn):
     deploy_cmd = jboss_conn + f"deploy /opt/wildfly/deploy/{komponente}.war --name={komponente}.war --runtime-name={komponente}.war --all-server-groups'"
     _, _, stderr = client.exec_command(deploy_cmd)
     if stderr.read():
-        raise Exception(f"Deploy der neuen Version fehlgeschlagen: {stderr.read().decode('utf-8')}")
-    print("     Deploy erfolgreich.")
+        raise Exception(f"Deploy der neuen Version {RED}fehlgeschlagen{RESET}: {stderr.read().decode('utf-8')}")
+    print(f"     Deploy {GREEN}erfolgreich{RESET}.")
 
 
 """Aktualisiert oder fügt die SYSPARAM-Einträge hinzu."""
@@ -160,6 +166,6 @@ def remove_old_war_file(client, komponente, old_version, link, isSoapserver):
     error = stderr.read().decode('utf-8')
     if error:
         # Dies nur als Warnung behandeln, da der Deploy an sich erfolgreich war
-        print(f"     WARNUNG: Löschen der alten Version '{old_version}' fehlgeschlagen: {error}")
+        print(f"     WARNUNG: Löschen der alten Version '{old_version}' {RED}fehlgeschlagen{RESET}: {error}")
     else:
-        print("     Alte .war-Datei erfolgreich gelöscht.")
+        print(f"     Alte .war-Datei {GREEN}erfolgreich{RESET} gelöscht.")

@@ -1,6 +1,12 @@
 from tkinter import messagebox
 from deployment_steps import *
 
+# Farben definieren
+YELLOW = '\033[93m'
+GREEN = '\033[92m'  
+RED = '\033[91m'
+RESET = '\033[0m'
+
 """ für das Aktualisieren einer BESTEHENDEN Komponente. """
 def deploy_existing_component(client, decr_root, conn, cursor, baen, komponente, version, cluster_val):
     
@@ -16,7 +22,7 @@ def deploy_existing_component(client, decr_root, conn, cursor, baen, komponente,
         # Verbindung herstellen
         print(f"  -> Stelle SSH-Verbindung zu {cluster_val} her...")
         client.connect(cluster_val, username='root', password=decr_root, look_for_keys=False, allow_agent=False)
-        print("     Verbindung erfolgreich.")
+        print(f"     Verbindung {GREEN}erfolgreich{RESET}.")
 
         # Setup
         isSoapserver = komponente in ["wws", "wwsartdecl"]
@@ -43,7 +49,7 @@ def deploy_existing_component(client, decr_root, conn, cursor, baen, komponente,
         messagebox.showinfo("Erfolg", f"Update von '{komponente}' erfolgreich abgeschlossen!")
 
     except Exception as e:
-        messagebox.showerror("Prozess fehlgeschlagen", f"Ein Fehler ist aufgetreten:\n\n{e}")
+        messagebox.showerror(f"Prozess {RED}fehlgeschlagen{RESET}", f"Ein Fehler ist aufgetreten:\n\n{e}")
         return
 
 """ Workflow NUR für das Deployment einer NEUEN Komponente (aus dem Popup). """
@@ -61,7 +67,7 @@ def deploy_new_component(client, decr_root, conn, cursor, baen, komponente, vers
         # Verbindung herstellen
         print(f"  -> Stelle SSH-Verbindung zu {cluster_val} her...")
         client.connect(cluster_val, username='root', password=decr_root, look_for_keys=False, allow_agent=False)
-        print("     Verbindung erfolgreich.")
+        print(f"     Verbindung {GREEN}erfolgreich{RESET}.")
 
         # Setup
         isSoapserver = komponente in ["wws", "wwsartdecl"]
@@ -76,6 +82,6 @@ def deploy_new_component(client, decr_root, conn, cursor, baen, komponente, vers
         messagebox.showinfo("Erfolg", f"Deployment von '{komponente}' erfolgreich abgeschlossen!")
 
     except Exception as e:
-        messagebox.showerror("Prozess fehlgeschlagen", f"Ein Fehler ist aufgetreten:\n\n{e}")
+        messagebox.showerror(f"Prozess {RED}fehlgeschlagen{RESET}", f"Ein Fehler ist aufgetreten:\n\n{e}")
         return
 

@@ -9,8 +9,13 @@ PROD_BAEN = "-"
 PROD_PORT = 11000
 PROD_CLUSTERS = ["server320vmx", "server662vmx", "server3061vmx", "server3161vmx", "server3261vmx"]
 
+# Farben definieren
+YELLOW = '\033[93m'
+RED = '\033[91m'
+RESET = '\033[0m'
+
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-print("!!! STARTE IM PROD-UMGEBUNG !!!")
+print("!!! STARTE IM {YELLOW}PROD-UMGEBUNG{RESET} !!!")
 print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
 # Authentifizierung
@@ -24,5 +29,5 @@ client, conn, decr_root = authentifizierung.perform_authentication(
 if client and conn and decr_root:
     GUI.start_application(client, conn, decr_root, PROD_BAEN, PROD_CLUSTERS)
 else:
-    print("\nProgramm wird aufgrund eines Authentifizierungsfehlers beendet.")
+    print("\n{RED}Programm wird aufgrund eines Authentifizierungsfehlers beendet.")
     sys.exit(1)

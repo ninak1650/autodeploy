@@ -5,11 +5,11 @@ Für ein detailliertes Verständnis der Projektarchitektur und wie die einzelnen
 
 1. Code anpassen (für Test & Prod)
 
--In authentifizierung.py: Zeile 38 (saso-username)
+-In authentifizierung.py: Zeile 69 (username = saso-username)
 
--In autodeploy_test.py: Zeile 8 (PSNR)
+-In autodeploy_test.py: Zeile 8 (TEST_BAEN = Personal Nummer)
 
--In autodeploy_prod.py: Zeile 8 (PSNR)
+-In autodeploy_prod.py: Zeile 8 (PROD_BAEN = Personal Nummer)
 
 2. Umgebungsvariable setzen
 Die Umgebungsvariable DB_PASSPHRASE muss definiert werden.

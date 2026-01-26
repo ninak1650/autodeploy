@@ -6,25 +6,29 @@ RESET = '\033[0m'
 
 """Sucht nach einer alten Version der Komponente und gibt die Version zurück."""
 def find_old_version(client, komponente, link, isSoapserver):
+    
     print("  -> Suche nach alter Version...")
     nav = "cd /opt/wildfly/deploy && "
-    get_komp_cmd = nav + "ls " + (link if isSoapserver else komponente) + "-*"
     
+    search_name = ""
+    if komponente == "help":
+        search_name = "wwshelp"
+    else:
+        search_name = (link if isSoapserver else komponente)
+
+    get_komp_cmd = nav + "ls " + search_name + "-*" 
     _, stdout, _ = client.exec_command(get_komp_cmd)
     output = stdout.read().decode('utf-8').splitlines()
-
+    
     if output:
-        if komponente == "help":
-            old_version = output[0].replace("wwshelp-", "")[:-4]
-        else:
-            old_version = output[0].replace((link if isSoapserver else komponente) + "-", "")[:-4]
-        print(f"     Alte Version gefunden: {YELLOW}{old_version}{RESET}")
+        prefix_to_remove = search_name + "-"
+        old_version = output[0].replace(prefix_to_remove, "")[:-4]
+        print(f"    Alte Version gefunden: {YELLOW}{old_version}{RESET}")
         return old_version
     
-    print("     Keine alte Version gefunden.")
+    print("    Keine alte Version gefunden.")
     return None
-
-
+	
 """Lädt die angegebene .war-Datei aus dem Repository herunter."""
 def download_war_file(client, komponente, version, link, isSoapserver):
     print("  -> Lade neue .war-Datei herunter...")

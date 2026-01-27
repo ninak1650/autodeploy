@@ -1,3 +1,8 @@
+from colorama import init
+
+# Damit es mit CMD und WindowsPS funktioniert
+init()
+
 # Farben definieren
 YELLOW = '\033[93m'
 GREEN = '\033[92m'  

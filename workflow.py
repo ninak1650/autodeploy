@@ -1,6 +1,10 @@
 from tkinter import messagebox
 from deployment_steps import *
 import paramiko
+from colorama import init
+
+# Damit es mit CMD und WindowsPS funktioniert
+init()
 
 # Farben definieren
 YELLOW = '\033[93m'

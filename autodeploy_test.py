@@ -1,13 +1,18 @@
 import sys
 import authentifizierung
 import GUI
+from colorama import init
+
 
 # === TEST-KONFIGURATION ===
 TEST_SERVER = "p_wwsdev2"
 TEST_DATABASE = "wwst3"
 TEST_BAEN = "-"
 TEST_PORT = 20000
-TEST_CLUSTERS = ["server690vmx", "server662vmx"]
+TEST_CLUSTERS = ["server690vmx"]
+
+# Damit es mit CMD und WindowsPS funktioniert
+init()
 
 # Farben definieren
 YELLOW = '\033[93m'

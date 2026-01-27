@@ -8,6 +8,10 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
 from base64 import urlsafe_b64encode, urlsafe_b64decode
+from colorama import init
+
+# Damit es mit CMD und WindowsPS funktioniert
+init()
 
 # Farben
 CYAN = '\033[96m'
@@ -15,6 +19,9 @@ YELLOW = '\033[93m'
 GREEN = '\033[92m'
 RED = '\033[91m'
 RESET = '\033[0m'
+
+# SaSo user
+username = ""
 
 def getpass_colored(prompt="Password: ", mask="*", color=""):
     """Liest ein Passwort von der Konsole und zeigt eine farbige Maske an."""
@@ -66,7 +73,6 @@ def decrypt_root_password():
 
 def connect_to_database(server, database, port):
     """Fragt das Sybase-Passwort ab und stellt eine DB-Verbindung her."""
-    username = ""
     while True:
         prompt_text = (
             f"Gib das Sybase-Passwort für {YELLOW}'{username}'{RESET} "

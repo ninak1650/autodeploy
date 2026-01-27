@@ -1,6 +1,7 @@
 import sys
 import authentifizierung
 import GUI
+from colorama import init
 
 # === PRODUKTIV-KONFIGURATION ===
 PROD_SERVER = "p_wws"      
@@ -8,6 +9,9 @@ PROD_DATABASE = "wwstp"
 PROD_BAEN = "-"
 PROD_PORT = 11000
 PROD_CLUSTERS = ["server320vmx", "server662vmx", "server3061vmx", "server3161vmx", "server3261vmx"]
+
+# Damit es mit CMD und WindowsPS funktioniert
+init()
 
 # Farben definieren
 YELLOW = '\033[93m'

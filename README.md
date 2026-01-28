@@ -5,7 +5,7 @@ Für ein detailliertes Verständnis der Projektarchitektur und wie die einzelnen
 
 1. Code anpassen (für Test & Prod)
 
--In authentifizierung.py: Zeile 69 (username = saso-username)
+-In authentifizierung.py: Zeile 24 (username = saso-username)
 
 -In autodeploy_test.py: Zeile 8 (TEST_BAEN = Personal Nummer)
 

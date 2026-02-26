@@ -13,7 +13,6 @@ Für ein detailliertes Verständnis der Projektarchitektur und wie die einzelnen
 
 2. Umgebungsvariable setzen
 Die Umgebungsvariable DB_PASSPHRASE muss definiert werden.
-➡️ Martina fragen für den korrekten Wert.
 
 -Powershell: $env:DB_PASSPHRASE = " "
 
@@ -50,14 +49,3 @@ C:\was\auch\immer\Python\Python313\Scripts\
 Manuell Alias setzen (PowerShell):
 
 Set-Alias python "C:\Pfad\zum\Python\python.exe"
-
-
-
-🔹 3. Probleme bei Bibliotheken
-Wenn Python-Pakete fehlen, diese installieren:
-
-pip3 install <paketname>
-
-
-Falls die Firewall pip blockiert:
-➡️ Auf externem Netzwerk installieren (z. B. Mobile Daten oder im Home-Office).

@@ -2,11 +2,11 @@ Ausnahmen:
 
 server320vmx:
 1. jmx-console - Link nicht bei den Anderen
--2. wwsreports - wget http://wwsrepo.mueller.de/repository/handelsmanagement/wwsreports/4.36/16/wwsreports-4.36-16.war, keine SYSPARAM Einträge
+-2. wwsreports - wget /.../.war, keine SYSPARAM Einträge
 -3. jmxservice - kein SYPARAM Eintrag
 
 server662vmx:
--1. help.war - komponente wwshelp, wget http://wwsrepo.mueller.de/repository/handelsmanagement/wwshelp/4.35/141/wwshelp-4.35-141.war, auch keine SYSPARAM ?
+-1. help.war - komponente wwshelp, wget /.../.war
 2. jmx-console - Link nicht bei den Anderen
 3. musterprozess - da muss noch was gemacht werden, aber vorher, der Rest ist wie üblich?
 -4. wws.war - soapserver, SYSPARAM auch
@@ -24,4 +24,5 @@ server3161vmx:
 serevr3261vmx:
 1. jmx-console - Link nicht bei den Anderen 
 -2. jmxservice - kein SYPARAM Eintrag
+
 
